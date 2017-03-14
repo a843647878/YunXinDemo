@@ -1,0 +1,161 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
+    defaultConfig {
+        applicationId "com.cu.yunxindemo"
+        minSdkVersion 22
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        compileOptions {
+            sourceCompatibility JavaVersion.VERSION_1_7
+            targetCompatibility JavaVersion.VERSION_1_7
+        }
+        ndk {
+            //设置支持的SO库架构
+            abiFilters "armeabi-v7a", "x86","arm64-v8a","x86_64"
+        }
+    }
+
+    //签名
+    signingConfigs {
+        debug {
+            try {
+                def signP = getSigningProperties(true)
+                storeFile file(signP[0])
+            } catch (ex) {
+                ex.printStackTrace()
+            }
+        }
+        release {
+            try {
+                def signP = getSigningProperties(false)
+                storeFile file(signP[0])
+                storePassword signP[1]
+                keyAlias signP[2]
+                keyPassword signP[3]
+            } catch (ex) {
+                ex.printStackTrace()
+            }
+        }
+
+    }
+
+//渠道Flavors_打包
+    productFlavors {
+        BaiDu {}
+    }
+
+    //批量配置
+    productFlavors.all { flavor ->
+        flavor.manifestPlaceholders = [UMENG_CHANNEL_VALUE: name]
+    }
+    buildTypes {
+        debug {
+            ndk {
+                abiFilters = ["armeabi"]
+            }
+            buildConfigField "boolean", "IS_DEBUG", "true"
+            buildConfigField "int", "URL_CONFIG", "0"
+            versionNameSuffix "_debug"
+            minifyEnabled false
+            zipAlignEnabled false
+            shrinkResources false
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+
+        release {
+            buildConfigField "boolean", "IS_DEBUG", "false"
+            buildConfigField "int", "URL_CONFIG", "2"
+            shrinkResources false   // 移除无用的resource文件
+            zipAlignEnabled false        //Zipalign优化
+            minifyEnabled false     //混淆
+            signingConfig signingConfigs.release
+            pseudoLocalesEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            def outputFile = output.outputFile
+            if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                def fileName = outputFile.name.replace(".apk", "-${defaultConfig.versionName}.apk")
+                output.outputFile = new File(outputFile.parent, fileName)
+            }
+        }
+    }
+
+
+
+
+    //分包 非常重要
+    dexOptions {
+        jumboMode = true  //支持最大工程模式
+        javaMaxHeapSize "8g"
+        // incremental true //使用增量模式
+
+        preDexLibraries = false //预编译
+        threadCount = "8" //线程数目
+    }
+    sourceSets {
+        main {
+            java.srcDirs = ['src/main/java', 'src/main/java-gen', 'libs']
+            jniLibs.srcDirs = ['src/main/jniLibs']
+        }
+    }
+}
+
+
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:appcompat-v7:25.1.0'
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:multidex:1.0.1'//分包需要
+
+    compile 'com.github.w446108264:AndroidEmoji:1.3' //表情
+    compile 'com.github.w446108264:XhsEmoticonsKeyboard:2.0.4' //键盘
+    compile 'com.android.support:recyclerview-v7:25.1.0'
+    compile 'jp.wasabeef:recyclerview-animators:2.2.4'//recyclerview 动画
+    compile 'com.yqritc:recyclerview-flexibledivider:1.4.0'//recyclerview 分割线
+    compile 'com.github.bumptech.glide:glide:3.7.0'
+    compile 'com.android.support:design:25.1.0'
+
+    // 添加依赖。注意，版本号必须一致。
+    // 基础功能 (必需)
+    compile 'com.netease.nimlib:basesdk:3.3.0'
+    // 音视频需要
+    compile 'com.netease.nimlib:avchat:3.3.0'
+    // 聊天室需要
+    compile 'com.netease.nimlib:chatroom:3.3.0'
+}
+
+// -----------------------------------------------------------@Assist
+String[] getSigningProperties(boolean isDebug) {
+    File propFile = new File('sign.properties')
+    if (propFile.exists()) {
+        def Properties props = new Properties()
+        props.load(new FileInputStream(propFile))
+        if (isDebug) {
+            def signP = new String[1];
+            signP[0] = props['DEBUG_STORE_FILE']
+            return signP
+        } else {
+            def signP = new String[4];
+            signP[0] = props['STORE_FILE']
+            signP[1] = props['STORE_PASSWORD']
+            signP[2] = props['KEY_ALIAS']
+            signP[3] = props['KEY_PASSWORD']
+            return signP
+        }
+    }
+}
