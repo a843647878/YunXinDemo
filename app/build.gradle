@@ -5,11 +5,10 @@ android {
     buildToolsVersion "25.0.2"
     defaultConfig {
         applicationId "com.cu.yunxindemo"
-        minSdkVersion 22
+        minSdkVersion 14
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         compileOptions {
             sourceCompatibility JavaVersion.VERSION_1_7
@@ -115,14 +114,12 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
+
     compile 'com.android.support:appcompat-v7:25.1.0'
-    testCompile 'junit:junit:4.12'
+//    testCompile 'junit:junit:4.12'
     compile 'com.android.support:multidex:1.0.1'//分包需要
 
-    compile 'com.github.w446108264:AndroidEmoji:1.3' //表情
+    compile 'com.github.w446108264:AndroidEmoji:1.3-withsource' //表情
     compile 'com.github.w446108264:XhsEmoticonsKeyboard:2.0.4' //键盘
     compile 'com.android.support:recyclerview-v7:25.1.0'
     compile 'jp.wasabeef:recyclerview-animators:2.2.4'//recyclerview 动画

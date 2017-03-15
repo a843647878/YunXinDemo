@@ -7,6 +7,10 @@ import android.view.View;
 import android.widget.Button;
 
 import com.cu.yunxindemo.R;
+import com.netease.nimlib.sdk.NIMClient;
+import com.netease.nimlib.sdk.friend.FriendService;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,5 +31,7 @@ public class MainActivity extends AppCompatActivity {
                 LoginActivity.lunch(MainActivity.this);
             }
         });
+
+
     }
 }

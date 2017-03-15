@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.cu.yunxindemo.R;
 import com.cu.yunxindemo.util.L;
 import com.cu.yunxindemo.util.MD5;
+import com.cu.yunxindemo.util.Preferences;
 import com.cu.yunxindemo.util.T;
 import com.netease.nimlib.sdk.NIMClient;
 import com.netease.nimlib.sdk.RequestCallback;
@@ -98,6 +99,9 @@ public class LoginActivity extends Activity{
                     public void onSuccess(LoginInfo param) {
                         //登录成功
                         T.showShort("登录成功："+param.getAccount());
+                        Preferences.saveUserAccount(param.getAccount());
+                        Preferences.saveUserToken(param.getToken());
+                        FriendsList.launch(LoginActivity.this);
                     }
 
                     @Override
