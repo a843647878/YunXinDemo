@@ -9,20 +9,14 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.view.GestureDetector;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.EditText;
 
 import com.cu.yunxindemo.R;
 import com.cu.yunxindemo.adapter.ChatAdapter;
 import com.cu.yunxindemo.adapter.xekadapter.AppsAdapter;
-import com.cu.yunxindemo.entity.AppsMenu;
 import com.cu.yunxindemo.entity.im.AppBean;
 import com.cu.yunxindemo.util.LogUtils;
 import com.cu.yunxindemo.util.T;
@@ -32,7 +26,6 @@ import com.cu.yunxindemo.util.xekutil.SimpleCommonUtils;
 import com.cu.yunxindemo.view.refresh.MaterialRefreshLayout;
 import com.cu.yunxindemo.view.refresh.MaterialRefreshListener;
 import com.cu.yunxindemo.view.widget.BaseRecyclerAdapter;
-import com.netease.nimlib.sdk.InvocationFuture;
 import com.netease.nimlib.sdk.NIMClient;
 import com.netease.nimlib.sdk.Observer;
 import com.netease.nimlib.sdk.RequestCallback;
@@ -42,31 +35,15 @@ import com.netease.nimlib.sdk.msg.MsgServiceObserve;
 import com.netease.nimlib.sdk.msg.constant.SessionTypeEnum;
 import com.netease.nimlib.sdk.msg.model.IMMessage;
 import com.netease.nimlib.sdk.msg.model.QueryDirectionEnum;
-import com.sj.emoji.DefEmoticons;
 import com.sj.emoji.EmojiBean;
-import com.sj.emoji.EmojiDisplay;
-import com.sj.emoji.EmojiParse;
-import com.sj.emoji.EmojiSpan;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.regex.Matcher;
 
 import sj.keyboard.XhsEmoticonsKeyBoard;
-import sj.keyboard.adpater.EmoticonsAdapter;
-import sj.keyboard.adpater.PageSetAdapter;
 import sj.keyboard.data.EmoticonEntity;
-import sj.keyboard.data.EmoticonPageEntity;
-import sj.keyboard.data.EmoticonPageSetEntity;
 import sj.keyboard.interfaces.EmoticonClickListener;
-import sj.keyboard.interfaces.EmoticonDisplayListener;
-import sj.keyboard.interfaces.EmoticonFilter;
-import sj.keyboard.interfaces.PageViewInstantiateListener;
-import sj.keyboard.utils.EmoticonsKeyboardUtils;
-import sj.keyboard.utils.imageloader.ImageBase;
-import sj.keyboard.widget.EmoticonPageView;
 import sj.keyboard.widget.EmoticonsEditText;
 import sj.keyboard.widget.FuncLayout;
 
@@ -77,7 +54,7 @@ import sj.keyboard.widget.FuncLayout;
  * 单聊界面
  */
 
-public class SingleChatActivity extends Activity implements Observer<List<IMMessage>> ,FuncLayout.OnFuncKeyBoardListener,BaseRecyclerAdapter.OnItemChildClickListener,
+public class GroupChatActivity extends Activity implements Observer<List<IMMessage>> ,FuncLayout.OnFuncKeyBoardListener,BaseRecyclerAdapter.OnItemChildClickListener,
         BaseRecyclerAdapter.OnItemClickListener{
     public static final String KEY_SESSIONID = "sessionId";
 
@@ -88,7 +65,7 @@ public class SingleChatActivity extends Activity implements Observer<List<IMMess
 
     public static void launch(Context context,String sessionId){
         if (sessionId == null) return;
-        Intent intent = new Intent(context,SingleChatActivity.class);
+        Intent intent = new Intent(context,GroupChatActivity.class);
         intent.putExtra(KEY_SESSIONID,sessionId);
         context.startActivity(intent);
     }
@@ -193,7 +170,7 @@ public class SingleChatActivity extends Activity implements Observer<List<IMMess
                  }
              });
         } else {
-            NIMClient.getService(MsgService.class).queryMessageList(sessionId, SessionTypeEnum.P2P, 0, 10).setCallback(new RequestCallback<List<IMMessage>>() {
+            NIMClient.getService(MsgService.class).queryMessageList(sessionId, SessionTypeEnum.Team, 0, 10).setCallback(new RequestCallback<List<IMMessage>>() {
                 @Override
                 public void onSuccess(List<IMMessage> param) {
                     chatAdapter.addItems(param);
@@ -298,7 +275,7 @@ public class SingleChatActivity extends Activity implements Observer<List<IMMess
         if (TextUtils.isEmpty(content)) return;
         IMMessage message = MessageBuilder.createTextMessage(
                 sessionId, // 聊天对象的 ID，如果是单聊，为用户帐号，如果是群聊，为群组 ID
-                SessionTypeEnum.P2P, // 聊天类型，单聊或群组
+                SessionTypeEnum.Team, // 聊天类型，单聊或群组
                 content // 文本内容
         );
         sendMessage(message);
@@ -312,7 +289,7 @@ public class SingleChatActivity extends Activity implements Observer<List<IMMess
         File file = new File(filePath);
         IMMessage message = MessageBuilder.createAudioMessage(
                 sessionId, // 聊天对象的 ID，如果是单聊，为用户帐号，如果是群聊，为群组 ID
-                SessionTypeEnum.P2P, // 聊天类型，单聊或群组
+                SessionTypeEnum.Team, // 聊天类型，单聊或群组
                 file, // 音频文件
                 length // 音频持续时间，单位是ms
         );
@@ -328,7 +305,7 @@ public class SingleChatActivity extends Activity implements Observer<List<IMMess
             File file = new File(imagePath);
             IMMessage message = MessageBuilder.createImageMessage(
                     sessionId, // 聊天对象的 ID，如果是单聊，为用户帐号，如果是群聊，为群组 ID
-                    SessionTypeEnum.P2P, // 聊天类型，单聊或群组
+                    SessionTypeEnum.Team, // 聊天类型，单聊或群组
                     file, // 图片文件对象
                     null // 文件显示名字，如果第三方 APP 不关注，可以为 null
             );
@@ -462,6 +439,4 @@ public class SingleChatActivity extends Activity implements Observer<List<IMMess
     public void onItemChildClick(BaseRecyclerAdapter adapter, BaseRecyclerAdapter.ViewHolder holder, View view, int position) {
 
     }
-
-
 }

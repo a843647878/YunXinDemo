@@ -23,10 +23,9 @@ public class EmojiFilter extends EmoticonFilter {
         Matcher m = EmojiDisplay.getMatcher(text.toString().substring(start, text.toString().length()));
         if (m != null) {
             while (m.find()) {
-                Spannable spannable = EmojiDisplay.filterFromResource(editText.getContext(),
+                EmojiDisplay.filterFromResource(editText.getContext(),
                         new SpannableStringBuilder(editText.getText()),
                         EmojiDisplay.getFontHeight(editText), EmojiDisplay.HEAD_NAME, null);
-                editText.setText(spannable);
             }
         }
     }

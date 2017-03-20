@@ -101,7 +101,7 @@ public class LoginActivity extends Activity{
                         T.showShort("登录成功："+param.getAccount());
                         Preferences.saveUserAccount(param.getAccount());
                         Preferences.saveUserToken(param.getToken());
-                        FriendsList.launch(LoginActivity.this);
+                        GroupList.launch(LoginActivity.this);
                     }
 
                     @Override
